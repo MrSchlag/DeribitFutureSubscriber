@@ -2,7 +2,7 @@
 using System.Threading.Tasks;
 using Models.DeribitFutureSubscriber;
 
-namespace DeribitFutureSubscriber.Models
+namespace DeribitFutureSubscriber
 {
     public interface IClientWebSocket
     {

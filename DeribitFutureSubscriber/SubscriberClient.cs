@@ -1,7 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
+using System.Threading;
+using DeribitFutureSubscriber.DbModels;
 using DeribitFutureSubscriber.Models;
 using DeribitFutureSubscriber.RequestActions;
 using Models.DeribitFutureSubscriber;
@@ -11,15 +12,20 @@ namespace DeribitFutureSubscriber
 {
     public class SubscriberClient
     {
-        private IClientWebSocket _clientWebSocket;
-
+        private readonly IClientWebSocket _clientWebSocket;
+        private readonly IDbAccess<InsturmentTicker> _dbAccess;
         private int _requestId = 1;
 
         List<IRequestAction> _requestActions = new List<IRequestAction>();
 
-        public SubscriberClient(IClientWebSocket clientWebSocket)
+        private readonly Timer _dbInsertionTimer;
+
+        public SubscriberClient(IClientWebSocket clientWebSocket, IDbAccess<InsturmentTicker> dbAccess)
         {
             _clientWebSocket = clientWebSocket;
+            _dbAccess = dbAccess;
+
+            _dbInsertionTimer = new Timer(Insert, null, TimeSpan.Zero, new TimeSpan(0, 0, 2));
         }
 
         public void Run()
@@ -56,12 +62,11 @@ namespace DeribitFutureSubscriber
                             }
                         }
                         actionToRemove.ForEach(i => _requestActions.Remove(i));
-                        Console.WriteLine("request response");
                     }
 
                     if (jobject.TryGetValue("params", out var jTokenParams))
                     {
-                        HeartbeatNotificationHandler(jTokenParams).Wait();
+                        HeartbeatNotificationHandler(jobject);
                         TickerNotificationHandler(jobject);
                     }
                 }
@@ -79,27 +84,23 @@ namespace DeribitFutureSubscriber
 
         /* Heart Beat */
         private HashSet<string> _heartbeatResponseTokens = new() { "type" };
-        private async Task HeartbeatNotificationHandler(JToken token)
+        private void HeartbeatNotificationHandler(JObject jobject)
         {
+            var token = jobject["params"];
             if (token.Children<JProperty>().Any() && !token.Children<JProperty>().Any(i => !_heartbeatResponseTokens.Contains(i.Name))) //TODO : create requester
             {
                 var type = (string)token["type"];
+
                 if (type == "test_request")
                 {
-                    var request = new JsonRfcRequest<IntervalParam>
-                    {
-                        Method = "public/test",
-                        JsonRpc = "2.0",
-                        Id = _requestId++
-                    };
-
-                    Console.WriteLine("heartbeat test sent");
-                    await _clientWebSocket.Send(request);
+                    _requestActions.Add(new TestHeartbeatRequestAction(_clientWebSocket));
                 }
             }
         }
 
         /* Ticker */
+        private object _insturmentTickersToInsertLock = new object();
+        private List<InsturmentTicker> _insturmentTickersToInsert = new List<InsturmentTicker>();
         private void TickerNotificationHandler(JObject jobject)
         {
             jobject.TryGetValue("method", out var method);
@@ -107,7 +108,31 @@ namespace DeribitFutureSubscriber
             if (method.ToString() == "subscription")
             {
                 var test = jobject.ToObject<JsonRfcNotification<Ticker>>();
+                var instrumentTicker = new InsturmentTicker
+                {
+                    InstrumentName = test.Params.Data.InstrumentName,
+                    SettlementPrice = test.Params.Data.SettlementPrice
+                };
+
+                lock (_insturmentTickersToInsertLock)
+                {
+                    _insturmentTickersToInsert.Add(instrumentTicker);
+                }
+
                 Console.WriteLine("Received : " + test.Params.Data.InstrumentName);
+            }
+        }
+
+        private void Insert(object stateInfo)
+        {
+            if (!_insturmentTickersToInsert.Any())
+            {
+                return;
+            }
+            lock (_insturmentTickersToInsertLock)
+            {
+                _dbAccess.Insert(_insturmentTickersToInsert);
+                _insturmentTickersToInsert.Clear();
             }
         }
     }

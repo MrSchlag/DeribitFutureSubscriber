@@ -6,8 +6,9 @@ namespace DeribitFutureSubscriber
     {
         static void Main(string[] args)
         {
+            var dbAccess = new PostgresDbAccess(new DeribitFutureSubscriberDbContext());
             var cancelationTokenSource = new CancellationTokenSource();
-            var client = new SubscriberClient(new Models.ClientWebSocket(cancelationTokenSource.Token));
+            var client = new SubscriberClient(new ClientWebSocket(cancelationTokenSource.Token), dbAccess);
             client.Run();
         }
     }

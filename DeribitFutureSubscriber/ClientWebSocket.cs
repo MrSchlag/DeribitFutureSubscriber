@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 using Models.DeribitFutureSubscriber;
 using Newtonsoft.Json;
 
-namespace DeribitFutureSubscriber.Models
+namespace DeribitFutureSubscriber
 {
     public class ClientWebSocket : IClientWebSocket
     {
