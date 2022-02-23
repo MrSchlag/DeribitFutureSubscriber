@@ -3,7 +3,7 @@ using DeribitFutureSubscriber.DbModels;
 
 namespace DeribitFutureSubscriber
 {
-    public class PostgresDbAccess : IDbAccess<InsturmentTicker>
+    public class PostgresDbAccess : IDbAccess<InstrumentTicker>
     {
         private object _lock = new object();
         private DeribitFutureSubscriberDbContext _dbContext;
@@ -13,7 +13,7 @@ namespace DeribitFutureSubscriber
             _dbContext = dbContext;
         }
 
-        public void Insert(IList<InsturmentTicker> records)
+        public void Insert(IList<InstrumentTicker> records)
         {
             lock (_lock)
             {

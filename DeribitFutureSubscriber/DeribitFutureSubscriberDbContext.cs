@@ -10,6 +10,6 @@ namespace DeribitFutureSubscriber
             option.UseNpgsql("User ID=postgres;Password=mysecretpassword;Host=localhost;Port=5432;Database=MarketData;Pooling=true;");
         }
 
-        public DbSet<InsturmentTicker> InstrumentTikers { get; set; }
+        public DbSet<InstrumentTicker> InstrumentTikers { get; set; }
     }
 }

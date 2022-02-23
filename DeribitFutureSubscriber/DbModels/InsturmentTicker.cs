@@ -1,6 +1,6 @@
 ﻿namespace DeribitFutureSubscriber.DbModels
 {
-    public class InsturmentTicker
+    public class InstrumentTicker
     {
         public int Id { get; set; }
 

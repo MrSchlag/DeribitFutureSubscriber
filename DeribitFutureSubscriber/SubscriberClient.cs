@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using DeribitFutureSubscriber.DbModels;
-using DeribitFutureSubscriber.Models;
 using DeribitFutureSubscriber.RequestActions;
 using Models.DeribitFutureSubscriber;
 using Newtonsoft.Json.Linq;
@@ -13,14 +12,14 @@ namespace DeribitFutureSubscriber
     public class SubscriberClient
     {
         private readonly IClientWebSocket _clientWebSocket;
-        private readonly IDbAccess<InsturmentTicker> _dbAccess;
+        private readonly IDbAccess<InstrumentTicker> _dbAccess;
         private int _requestId = 1;
 
         List<IRequestAction> _requestActions = new List<IRequestAction>();
 
         private readonly Timer _dbInsertionTimer;
 
-        public SubscriberClient(IClientWebSocket clientWebSocket, IDbAccess<InsturmentTicker> dbAccess)
+        public SubscriberClient(IClientWebSocket clientWebSocket, IDbAccess<InstrumentTicker> dbAccess)
         {
             _clientWebSocket = clientWebSocket;
             _dbAccess = dbAccess;
@@ -100,15 +99,15 @@ namespace DeribitFutureSubscriber
 
         /* Ticker */
         private object _insturmentTickersToInsertLock = new object();
-        private List<InsturmentTicker> _insturmentTickersToInsert = new List<InsturmentTicker>();
+        private List<InstrumentTicker> _insturmentTickersToInsert = new List<InstrumentTicker>();
         private void TickerNotificationHandler(JObject jobject)
         {
             jobject.TryGetValue("method", out var method);
-            method = method ?? string.Empty;
+            method ??= string.Empty;
             if (method.ToString() == "subscription")
             {
                 var test = jobject.ToObject<JsonRfcNotification<Ticker>>();
-                var instrumentTicker = new InsturmentTicker
+                var instrumentTicker = new InstrumentTicker
                 {
                     InstrumentName = test.Params.Data.InstrumentName,
                     SettlementPrice = test.Params.Data.SettlementPrice
@@ -129,9 +128,14 @@ namespace DeribitFutureSubscriber
             {
                 return;
             }
+            List<InstrumentTicker> toInsert;
             lock (_insturmentTickersToInsertLock)
             {
-                _dbAccess.Insert(_insturmentTickersToInsert);
+                toInsert = _insturmentTickersToInsert.ToList();
+            }
+            _dbAccess.Insert(toInsert);
+            lock (_insturmentTickersToInsertLock)
+            {
                 _insturmentTickersToInsert.Clear();
             }
         }
