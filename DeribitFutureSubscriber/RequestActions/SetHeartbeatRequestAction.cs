@@ -15,12 +15,12 @@ namespace DeribitFutureSubscriber.RequestActions
         {
             var request = new JsonRfcRequest<IntervalParam>
             {
-                Method = "public/set_heartbeat",
-                JsonRpc = "2.0",
+                Method = "public/set_heartbeat", //TODO : const
+                JsonRpc = "2.0", //TODO : const
                 Id = requestId,
                 Params = new IntervalParam
                 {
-                    Interval = 10
+                    Interval = 10 //TODO : const 
                 }
             };
 

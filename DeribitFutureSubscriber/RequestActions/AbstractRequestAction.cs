@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using DeribitFutureSubscriber.Models;
 using Newtonsoft.Json.Linq;
@@ -28,9 +29,10 @@ namespace DeribitFutureSubscriber.RequestActions
             if (_requestIdsWaited.Contains(id))
             {
                 result = await HandlerAction(jObject);
+                _requestIdsWaited.Remove(id);
                 _waitingResponse = false;
             }
-            return result;
+            return result && !_requestIdsWaited.Any();
         }
 
         public async Task<int> Request(int requestId)

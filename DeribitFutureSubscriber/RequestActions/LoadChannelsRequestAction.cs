@@ -12,6 +12,8 @@ namespace DeribitFutureSubscriber.RequestActions
         private bool _isChannelsLoaded = false;
         private readonly List<IRequestAction> _requestActions;
 
+        private readonly List<string> _currencies = new() { "BTC", "ETH", "USDC", "SOL" }; //TODO : get via /public/get_currency
+
         public LoadChannelsRequestAction(IClientWebSocket clientWebSocket, List<IRequestAction> requestActions) : base(clientWebSocket)
         {
             _requestActions = requestActions;
@@ -21,20 +23,23 @@ namespace DeribitFutureSubscriber.RequestActions
         {
             if (!_isChannelsLoaded)
             {
-                var request = new JsonRfcRequest<InstrumentParam>
+                foreach (var currency in _currencies)
                 {
-                    Method = "public/get_instruments",
-                    JsonRpc = "2.0",
-                    Id = requestId,
-                    Params = new InstrumentParam
+                    var request = new JsonRfcRequest<InstrumentParam>
                     {
-                        Kind = "future",
-                        Currency = "BTC",
-                        Expired = false
-                    }
-                };
-                _requestIdsWaited.Add(requestId++);
-                await _clientWebSocket.Send(request);
+                        Method = "public/get_instruments",
+                        JsonRpc = "2.0",
+                        Id = requestId,
+                        Params = new InstrumentParam
+                        {
+                            Kind = "future",
+                            Currency = currency,
+                            Expired = false
+                        }
+                    };
+                    _requestIdsWaited.Add(requestId++);
+                    await _clientWebSocket.Send(request);
+                }
             }
             return requestId;
         }

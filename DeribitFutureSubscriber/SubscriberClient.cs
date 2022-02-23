@@ -33,7 +33,7 @@ namespace DeribitFutureSubscriber
             _requestActions.Add(new SetHeartbeatRequestAction(_clientWebSocket));
             _requestActions.Add(new LoadChannelsRequestAction(_clientWebSocket, _requestActions));
 
-            while (true)
+            while (true) //TODO : use cancellation token
             {
                 if (!string.IsNullOrEmpty(response))
                 {
@@ -62,8 +62,7 @@ namespace DeribitFutureSubscriber
                     if (jobject.TryGetValue("params", out var jTokenParams))
                     {
                         HeartbeatNotificationHandler(jTokenParams).Wait();
-
-                        Console.WriteLine("notification");
+                        TickerNotificationHandler(jobject);
                     }
                 }
 
@@ -82,7 +81,7 @@ namespace DeribitFutureSubscriber
         private HashSet<string> _heartbeatResponseTokens = new() { "type" };
         private async Task HeartbeatNotificationHandler(JToken token)
         {
-            if (token.Children<JProperty>().Any() && !token.Children<JProperty>().Any(i => !_heartbeatResponseTokens.Contains(i.Name)))
+            if (token.Children<JProperty>().Any() && !token.Children<JProperty>().Any(i => !_heartbeatResponseTokens.Contains(i.Name))) //TODO : create requester
             {
                 var type = (string)token["type"];
                 if (type == "test_request")
@@ -97,6 +96,18 @@ namespace DeribitFutureSubscriber
                     Console.WriteLine("heartbeat test sent");
                     await _clientWebSocket.Send(request);
                 }
+            }
+        }
+
+        /* Ticker */
+        private void TickerNotificationHandler(JObject jobject)
+        {
+            jobject.TryGetValue("method", out var method);
+            method = method ?? string.Empty;
+            if (method.ToString() == "subscription")
+            {
+                var test = jobject.ToObject<JsonRfcNotification<Ticker>>();
+                Console.WriteLine("Received : " + test.Params.Data.InstrumentName);
             }
         }
     }
