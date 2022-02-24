@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using DeribitFutureSubscriber.DbModels;
 
 namespace DeribitFutureSubscriber
@@ -19,10 +21,17 @@ namespace DeribitFutureSubscriber
         {
             lock (_lock)
             {
-                //_dbContext.InstrumentTikers.AddRange(records);
                 _dbContext.FutureTickers.AddRange(records);
                 _dbContext.SaveChanges();
             }
         }
+
+        public IEnumerable<FutureTicker> GetRecords()
+        {
+            return _dbContext.FutureTickers;
+        }
+
+        
+        
     }
 }

@@ -9,7 +9,6 @@
     <None Remove="Newtonsoft.Json" />
     <None Remove="Models\" />
     <None Remove="RequestActions\" />
-    <None Remove="DbModels\" />
     <None Remove="Microsoft.EntityFrameworkCore" />
     <None Remove="Npgsql.EntityFrameworkCore.PostgreSQL" />
   </ItemGroup>
@@ -21,6 +20,8 @@
   <ItemGroup>
     <Folder Include="Models\" />
     <Folder Include="RequestActions\" />
-    <Folder Include="DbModels\" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\DeribitFutureDatabaseLibrary\DeribitFutureDatabaseLibrary.csproj" />
   </ItemGroup>
 </Project>

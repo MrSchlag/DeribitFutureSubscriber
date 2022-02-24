@@ -5,5 +5,7 @@ namespace DeribitFutureSubscriber
     public interface IDbAccess<T>
     {
         void Insert(IList<T> records);
+
+        IEnumerable<T> GetRecords();
     }
 }

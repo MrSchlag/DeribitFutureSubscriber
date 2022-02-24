@@ -5,6 +5,10 @@ VisualStudioVersion = 16.0.810.19
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DeribitFutureSubscriber", "DeribitFutureSubscriber\DeribitFutureSubscriber.csproj", "{AB351153-FA55-4AEC-80B5-A3CB1850DA1B}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DeribitFutureAPI", "DeribitFutureAPI\DeribitFutureAPI.csproj", "{5E13BF82-53D1-4D79-9286-B49571FE7E60}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DeribitFutureDatabaseLibrary", "DeribitFutureDatabaseLibrary\DeribitFutureDatabaseLibrary.csproj", "{300CAEC3-E134-4335-B67B-BACEAC5B2881}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,6 +19,14 @@ Global
 		{AB351153-FA55-4AEC-80B5-A3CB1850DA1B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{AB351153-FA55-4AEC-80B5-A3CB1850DA1B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{AB351153-FA55-4AEC-80B5-A3CB1850DA1B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5E13BF82-53D1-4D79-9286-B49571FE7E60}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5E13BF82-53D1-4D79-9286-B49571FE7E60}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5E13BF82-53D1-4D79-9286-B49571FE7E60}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5E13BF82-53D1-4D79-9286-B49571FE7E60}.Release|Any CPU.Build.0 = Release|Any CPU
+		{300CAEC3-E134-4335-B67B-BACEAC5B2881}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{300CAEC3-E134-4335-B67B-BACEAC5B2881}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{300CAEC3-E134-4335-B67B-BACEAC5B2881}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{300CAEC3-E134-4335-B67B-BACEAC5B2881}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

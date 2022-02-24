@@ -23,17 +23,3 @@ namespace DeribitFutureSubscriber.DbModels
         public decimal OpenInterest { get; set; }
     }
 }
-
-/*
-CREATE TABLE public."FutureTickers"
-(
-    id integer NOT NULL GENERATED ALWAYS AS IDENTITY ( START 0 MINVALUE 0 ),
-    name character varying[],
-    open_interest numeric,
-    settlement_price numeric,
-    PRIMARY KEY (id)
-);
-
-ALTER TABLE IF EXISTS public."FutureTickers"
-    OWNER to postgres;
-*/
