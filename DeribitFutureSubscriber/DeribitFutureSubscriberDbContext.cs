@@ -5,11 +5,16 @@ namespace DeribitFutureSubscriber
 {
     public class DeribitFutureSubscriberDbContext : DbContext
     {
-        protected override void OnConfiguring(DbContextOptionsBuilder option)
+        public DeribitFutureSubscriberDbContext() : base()
         {
-            option.UseNpgsql("User ID=postgres;Password=mysecretpassword;Host=localhost;Port=5432;Database=MarketData;Pooling=true;");
+            FutureTickers = Set<FutureTicker>();
         }
 
-        public DbSet<InstrumentTicker> InstrumentTikers { get; set; }
+        protected override void OnConfiguring(DbContextOptionsBuilder option)
+        {
+            option.UseNpgsql("User ID=postgres;Password=mysecretpassword;Host=postgres;Port=5432;Database=MarketData2;Pooling=true;");
+        }
+
+        public DbSet<FutureTicker> FutureTickers { get; set; }
     }
 }

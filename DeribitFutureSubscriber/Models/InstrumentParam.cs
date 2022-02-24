@@ -15,3 +15,4 @@ namespace Models.DeribitFutureSubscriber
         public bool Expired { get; set; }
     }
 }
+

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
@@ -12,14 +12,14 @@ namespace DeribitFutureSubscriber
     public class SubscriberClient
     {
         private readonly IClientWebSocket _clientWebSocket;
-        private readonly IDbAccess<InstrumentTicker> _dbAccess;
+        private readonly IDbAccess<FutureTicker> _dbAccess;
         private int _requestId = 1;
 
         List<IRequestAction> _requestActions = new List<IRequestAction>();
 
         private readonly Timer _dbInsertionTimer;
 
-        public SubscriberClient(IClientWebSocket clientWebSocket, IDbAccess<InstrumentTicker> dbAccess)
+        public SubscriberClient(IClientWebSocket clientWebSocket, IDbAccess<FutureTicker> dbAccess)
         {
             _clientWebSocket = clientWebSocket;
             _dbAccess = dbAccess;
@@ -30,7 +30,7 @@ namespace DeribitFutureSubscriber
         public void Run()
         {
             _clientWebSocket.Connect(new Uri("wss://test.deribit.com/ws/api/v2")).Wait();
-            
+
             var response = string.Empty;
 
             var authRequestAction = new AuthenticationRequestAction(_clientWebSocket);
@@ -99,7 +99,7 @@ namespace DeribitFutureSubscriber
 
         /* Ticker */
         private object _insturmentTickersToInsertLock = new object();
-        private List<InstrumentTicker> _insturmentTickersToInsert = new List<InstrumentTicker>();
+        private List<FutureTicker> _insturmentTickersToInsert = new List<FutureTicker>();
         private void TickerNotificationHandler(JObject jobject)
         {
             jobject.TryGetValue("method", out var method);
@@ -107,10 +107,12 @@ namespace DeribitFutureSubscriber
             if (method.ToString() == "subscription")
             {
                 var test = jobject.ToObject<JsonRfcNotification<Ticker>>();
-                var instrumentTicker = new InstrumentTicker
+                var instrumentTicker = new FutureTicker
                 {
-                    InstrumentName = test.Params.Data.InstrumentName,
-                    SettlementPrice = test.Params.Data.SettlementPrice
+                    Name = test.Params.Data.InstrumentName,
+                    Timestamp = new DateTime(1970, 1, 1, 0, 0, 0, 0).AddMilliseconds(test.Params.Data.Timestamp),
+                    SettlementPrice = test.Params.Data.SettlementPrice,
+                    OpenInterest = test.Params.Data.OpenInterest
                 };
 
                 lock (_insturmentTickersToInsertLock)
@@ -128,7 +130,7 @@ namespace DeribitFutureSubscriber
             {
                 return;
             }
-            List<InstrumentTicker> toInsert;
+            List<FutureTicker> toInsert;
             lock (_insturmentTickersToInsertLock)
             {
                 toInsert = _insturmentTickersToInsert.ToList();
