@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using DeribitFutureSubscriber.RequestActions;
 using Newtonsoft.Json.Linq;
@@ -15,8 +16,8 @@ namespace DeribitFutureSubscriber.NotificationHandlers
             _requestActions = requestAction;
             _clientWebSocket = clientWebSocket;
         }
-
-        public void NotifiactionHandler(JObject jobject)
+       
+        public void NotificationHandler(JObject jobject)
         {
             var token = jobject["params"];
             if (token.Children<JProperty>().Any() && token.Children<JProperty>().Any(i => i.Name == "type"))
@@ -29,5 +30,9 @@ namespace DeribitFutureSubscriber.NotificationHandlers
                 }
             }
         }
-    }
+
+        public void Dispose()
+        {
+        }
+    }   
 }

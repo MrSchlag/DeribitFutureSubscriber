@@ -8,8 +8,10 @@ namespace DeribitFutureSubscriber
         {
             var dbAccess = new FutureTickerAccess(new DeribitFutureSubscriberDbContext());
             var cancelationTokenSource = new CancellationTokenSource();
-            var client = new SubscriberClient(new ClientWebSocket(cancelationTokenSource.Token), dbAccess);
-            client.Run();
+            using (var client = new SubscriberClient(new ClientWebSocket(cancelationTokenSource.Token), dbAccess, cancelationTokenSource))
+            {
+                client.Run();
+            }
         }
     }
 }

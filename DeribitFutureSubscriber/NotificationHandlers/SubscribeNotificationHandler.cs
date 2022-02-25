@@ -10,10 +10,10 @@ namespace DeribitFutureSubscriber.NotificationHandlers
 {
     public class SubscribeNotificationHandler : INotificationHandler
     {
-        private object _insturmentTickersToInsertLock = new object();
-        private List<FutureTicker> _insturmentTickersToInsert = new List<FutureTicker>();
+        private readonly object _insturmentTickersToInsertLock = new object();
+        private readonly List<FutureTicker> _insturmentTickersToInsert = new();
 
-        private IDbAccess<FutureTicker> _dbAccess;
+        private readonly IDbAccess<FutureTicker> _dbAccess;
         private readonly Timer _dbInsertionTimer;
 
         public SubscribeNotificationHandler(IDbAccess<FutureTicker> dbAccess)
@@ -22,7 +22,7 @@ namespace DeribitFutureSubscriber.NotificationHandlers
             _dbAccess = dbAccess;
         }
 
-        public void NotifiactionHandler(JObject jobject)
+        public void NotificationHandler(JObject jobject)
         {
             jobject.TryGetValue("method", out var method);
             method ??= string.Empty;
@@ -78,5 +78,7 @@ namespace DeribitFutureSubscriber.NotificationHandlers
                 _insturmentTickersToInsert.Clear();
             }
         }
+
+        public void Dispose() => _dbInsertionTimer.Dispose();
     }
 }

@@ -1,9 +1,10 @@
-﻿using Newtonsoft.Json.Linq;
+﻿using System;
+using Newtonsoft.Json.Linq;
 
 namespace DeribitFutureSubscriber.NotificationHandlers
 {
-    public interface INotificationHandler
+    public interface INotificationHandler : IDisposable
     {
-        void NotifiactionHandler(JObject jobject);
+        void NotificationHandler(JObject jobject);
     }
 }
