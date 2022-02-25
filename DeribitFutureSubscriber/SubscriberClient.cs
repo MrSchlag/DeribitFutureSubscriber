@@ -1,10 +1,9 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading;
 using DeribitFutureSubscriber.DbModels;
+using DeribitFutureSubscriber.NotificationHandlers;
 using DeribitFutureSubscriber.RequestActions;
-using Models.DeribitFutureSubscriber;
 using Newtonsoft.Json.Linq;
 
 namespace DeribitFutureSubscriber
@@ -16,27 +15,33 @@ namespace DeribitFutureSubscriber
         private int _requestId = 1;
 
         List<IRequestAction> _requestActions = new List<IRequestAction>();
+        List<INotificationHandler> _notificationHandlers = new List<INotificationHandler>();
 
-        private readonly Timer _dbInsertionTimer;
 
         public SubscriberClient(IClientWebSocket clientWebSocket, IDbAccess<FutureTicker> dbAccess)
         {
             _clientWebSocket = clientWebSocket;
             _dbAccess = dbAccess;
 
-            _dbInsertionTimer = new Timer(Insert, null, TimeSpan.Zero, new TimeSpan(0, 0, 2));
+        }
+
+        private void SetUpActions()
+        {
+            _clientWebSocket.Connect(new Uri("wss://test.deribit.com/ws/api/v2")).Wait();
+
+            _requestActions.Add(new SetHeartbeatRequestAction(_clientWebSocket));
+            _requestActions.Add(new LoadChannelsRequestAction(_clientWebSocket, _requestActions));
+
+            _notificationHandlers.Add(new HeartbeatNotificationHandler(_requestActions, _clientWebSocket));
+            _notificationHandlers.Add(new SubscribeNotificationHandler(_dbAccess));
         }
 
         public void Run()
         {
-            _clientWebSocket.Connect(new Uri("wss://test.deribit.com/ws/api/v2")).Wait();
+            SetUpActions();
 
             var response = string.Empty;
-
             var authRequestAction = new AuthenticationRequestAction(_clientWebSocket);
-
-            _requestActions.Add(new SetHeartbeatRequestAction(_clientWebSocket));
-            _requestActions.Add(new LoadChannelsRequestAction(_clientWebSocket, _requestActions));
 
             while (true) //TODO : use cancellation token
             {
@@ -73,8 +78,10 @@ namespace DeribitFutureSubscriber
 
                     if (jobject.ContainsKey("params"))
                     {
-                        HeartbeatNotificationHandler(jobject);
-                        TickerNotificationHandler(jobject);
+                        foreach (var handler in _notificationHandlers)
+                        {
+                            handler.NotifiactionHandler(jobject);
+                        }
                     }
                 }
 
@@ -86,82 +93,6 @@ namespace DeribitFutureSubscriber
                 }
 
                 response = _clientWebSocket.Receive().Result;
-            }
-        }
-
-        /* Heart Beat */
-        private HashSet<string> _heartbeatResponseTokens = new() { "type" };
-        private void HeartbeatNotificationHandler(JObject jobject)
-        {
-            var token = jobject["params"];
-            if (token.Children<JProperty>().Any() && !token.Children<JProperty>().Any(i => !_heartbeatResponseTokens.Contains(i.Name))) //TODO : create requester
-            {
-                var type = (string)token["type"];
-
-                if (type == "test_request")
-                {
-                    _requestActions.Add(new TestHeartbeatRequestAction(_clientWebSocket));
-                }
-            }
-        }
-
-        /* Ticker */
-        private object _insturmentTickersToInsertLock = new object();
-        private List<FutureTicker> _insturmentTickersToInsert = new List<FutureTicker>();
-        private void TickerNotificationHandler(JObject jobject)
-        {
-            jobject.TryGetValue("method", out var method);
-            method ??= string.Empty;
-            if (method.ToString() == "subscription")
-            {
-                var test = jobject.ToObject<JsonRfcNotification<Ticker>>();
-                var instrumentTicker = new FutureTicker
-                {
-                    Name = test.Params.Data.InstrumentName,
-                    Timestamp = new DateTime(1970, 1, 1, 0, 0, 0, 0).AddMilliseconds(test.Params.Data.Timestamp),
-                    SettlementPrice = test.Params.Data.SettlementPrice,
-                    OpenInterest = test.Params.Data.OpenInterest,
-                    BestAskAmount = test.Params.Data.BestAskAmount,
-                    BestAskPrice = test.Params.Data.BestAskPrice,
-                    BestBidAmount = test.Params.Data.BestBidAmount,
-                    BestBidPrice = test.Params.Data.BestBidPrice,
-                    EstimatedDeliveryPrice = test.Params.Data.EstimatedDeliveryPrice,
-                    IndexPrice = test.Params.Data.IndexPrice,
-                    LastPrice = test.Params.Data.LastPrice,
-                    MarkPrice = test.Params.Data.MarkPrice,
-                    MaxPrice = test.Params.Data.MaxPrice,
-                    MinPrice = test.Params.Data.MinPrice,
-                    High = test.Params.Data.Stats.High,
-                    Low = test.Params.Data.Stats.Low,
-                    PriceChange = test.Params.Data.Stats.PriceChange,
-                    Volume = test.Params.Data.Stats.Volume,
-                    VolumeUsd = test.Params.Data.Stats.VolumeUsd
-                };
-
-                lock (_insturmentTickersToInsertLock)
-                {
-                    _insturmentTickersToInsert.Add(instrumentTicker);
-                }
-
-                Console.WriteLine("Received : " + test.Params.Data.InstrumentName);
-            }
-        }
-
-        private void Insert(object stateInfo)
-        {
-            if (!_insturmentTickersToInsert.Any())
-            {
-                return;
-            }
-            List<FutureTicker> toInsert;
-            lock (_insturmentTickersToInsertLock)
-            {
-                toInsert = _insturmentTickersToInsert.ToList();
-            }
-            _dbAccess.Insert(toInsert);
-            lock (_insturmentTickersToInsertLock)
-            {
-                _insturmentTickersToInsert.Clear();
             }
         }
     }

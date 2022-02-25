@@ -11,6 +11,7 @@
     <None Remove="RequestActions\" />
     <None Remove="Microsoft.EntityFrameworkCore" />
     <None Remove="Npgsql.EntityFrameworkCore.PostgreSQL" />
+    <None Remove="NotificationHandlers\" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
@@ -20,6 +21,7 @@
   <ItemGroup>
     <Folder Include="Models\" />
     <Folder Include="RequestActions\" />
+    <Folder Include="NotificationHandlers\" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\DeribitFutureDatabaseLibrary\DeribitFutureDatabaseLibrary.csproj" />
