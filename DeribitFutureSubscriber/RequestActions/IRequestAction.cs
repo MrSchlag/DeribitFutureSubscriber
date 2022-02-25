@@ -8,6 +8,7 @@ namespace DeribitFutureSubscriber.RequestActions
         public Task<int> Request(int requestId);
         public Task<bool> RequestHandler(JObject jObject);
         public Task<bool> ErrorRequestHander(JObject jObject);
-        //TODO : error handling
     }
+
+
 }

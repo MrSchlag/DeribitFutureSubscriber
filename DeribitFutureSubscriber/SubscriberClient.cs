@@ -11,7 +11,7 @@ namespace DeribitFutureSubscriber
 {
     public class SubscriberClient : IDisposable
     {
-        private readonly CancellationTokenSource _cancellattionTokenSource;
+        private readonly CancellationTokenSource _cancellationTokenSource;
         private readonly IClientWebSocket _clientWebSocket;
         private readonly IDbAccess<FutureTicker> _dbAccess;
         private readonly List<IRequestAction> _requestActions = new();
@@ -23,7 +23,7 @@ namespace DeribitFutureSubscriber
             IDbAccess<FutureTicker> dbAccess,
             CancellationTokenSource cancellattionTokenSource)
         {
-            _cancellattionTokenSource = cancellattionTokenSource;
+            _cancellationTokenSource = cancellattionTokenSource;
             _clientWebSocket = clientWebSocket;
             _dbAccess = dbAccess;
         }
@@ -33,7 +33,7 @@ namespace DeribitFutureSubscriber
             _clientWebSocket.Connect(new Uri("wss://test.deribit.com/ws/api/v2")).Wait();
 
             _requestActions.Add(new SetHeartbeatRequestAction(_clientWebSocket));
-            _requestActions.Add(new LoadChannelsRequestAction(_clientWebSocket, _requestActions));
+            _requestActions.Add(new LoadChannelsRequestAction(_clientWebSocket, _requestActions, _cancellationTokenSource));
 
             _notificationHandlers.Add(new HeartbeatNotificationHandler(_requestActions, _clientWebSocket));
             _notificationHandlers.Add(new SubscribeNotificationHandler(_dbAccess));
@@ -44,14 +44,14 @@ namespace DeribitFutureSubscriber
             SetUpActions();
 
             var response = string.Empty;
-            var authRequestAction = new AuthenticationRequestAction(_clientWebSocket);
+            var authRequestAction = new AuthenticationRequestAction(_clientWebSocket, _cancellationTokenSource);
 
-            while (!_cancellattionTokenSource.Token.IsCancellationRequested) //TODO : use cancellation token
+            while (!_cancellationTokenSource.Token.IsCancellationRequested) //TODO : use cancellation token
             {
                 if (!string.IsNullOrEmpty(response))
                 {
                     var jobject = JObject.Parse(response);
-                    ErrorHandling(jobject);
+                    ErrorHandling(authRequestAction, jobject);
                     ResponseHandling(authRequestAction, jobject);
                     NotificationHandling(jobject);
                 }
@@ -99,17 +99,16 @@ namespace DeribitFutureSubscriber
             }
         }
 
-        private void ErrorHandling(JObject jobject)
+        private void ErrorHandling(AuthenticationRequestAction authRequestAction, JObject jobject)
         {
             if (jobject.ContainsKey("error"))
             {
+                var result = authRequestAction.ErrorRequestHander(jobject).Result;
                 var actionToRemove = new List<IRequestAction>();
                 foreach (var action in _requestActions.ToList())
                 {
-                    if (action.ErrorRequestHander(jobject).Result)
-                    {
-                        actionToRemove.Add(action);
-                    }
+                    result = action.ErrorRequestHander(jobject).Result;
+                    actionToRemove.Add(action);
                 }
                 actionToRemove.ForEach(i => _requestActions.Remove(i));
             }

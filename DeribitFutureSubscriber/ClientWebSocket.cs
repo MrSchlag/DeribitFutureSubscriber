@@ -29,19 +29,33 @@ namespace DeribitFutureSubscriber
         {
             var response = new ArraySegment<byte>(new byte[1024 * 10]);//TODO: buffer size management
 
-            var receiveResult = await _clientWebSocket.ReceiveAsync(response, _cancellationToken);
-            var msgBytes = response.Skip(response.Offset).Take(receiveResult.Count).ToArray();
-            var receivedMessage = Encoding.UTF8.GetString(msgBytes);
+            try
+            {
+                var receiveResult = await _clientWebSocket.ReceiveAsync(response, _cancellationToken);
+                var msgBytes = response.Skip(response.Offset).Take(receiveResult.Count).ToArray();
+                var receivedMessage = Encoding.UTF8.GetString(msgBytes);
 
-            return receivedMessage;
+                return receivedMessage;
+            }
+            catch (TaskCanceledException)
+            {
+                Console.WriteLine("received async cancelled");
+                return null;
+            }
         }
 
         public async Task Send<T>(JsonRfcRequest<T> jsonRfcRequest) where T : new()
         {
             var output = JsonConvert.SerializeObject(jsonRfcRequest);
             var outputAsByte = Encoding.UTF8.GetBytes(output);
-
-            await _clientWebSocket.SendAsync(new ArraySegment<byte>(outputAsByte), WebSocketMessageType.Text, true, _cancellationToken);
+            try
+            {
+                await _clientWebSocket.SendAsync(new ArraySegment<byte>(outputAsByte), WebSocketMessageType.Text, true, _cancellationToken);
+            }
+            catch (TaskCanceledException)
+            {
+                Console.WriteLine("send async cancelled");
+            }
         }
     }
 }

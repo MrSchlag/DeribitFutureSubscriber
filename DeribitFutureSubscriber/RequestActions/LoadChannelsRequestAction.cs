@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Models.DeribitFutureSubscriber;
 using Newtonsoft.Json.Linq;
@@ -11,12 +12,13 @@ namespace DeribitFutureSubscriber.RequestActions
     {
         private bool _isChannelsLoaded = false;
         private readonly List<IRequestAction> _requestActions;
-
+        private readonly CancellationTokenSource _cancellationTokenSource;
         private readonly List<string> _currencies = new() { "BTC", "ETH", "USDC", "SOL" }; //TODO : get via /public/get_currency
 
-        public LoadChannelsRequestAction(IClientWebSocket clientWebSocket, List<IRequestAction> requestActions) : base(clientWebSocket)
+        public LoadChannelsRequestAction(IClientWebSocket clientWebSocket, List<IRequestAction> requestActions, CancellationTokenSource cancellationTokenSource) : base(clientWebSocket)
         {
             _requestActions = requestActions;
+            _cancellationTokenSource = cancellationTokenSource;
         }
 
         protected override async Task<int> RequestAction(int requestId)
@@ -60,7 +62,8 @@ namespace DeribitFutureSubscriber.RequestActions
 
         protected override Task<bool> ErrorHandlerAction(JObject jObject)
         {
-            Console.Error.WriteLine("LoadChannelRequestAction error");
+            Console.Error.WriteLine("LoadChannelRequestAction error fatal");
+            _cancellationTokenSource.Cancel();
             return Task.FromResult(true);
         }
     }

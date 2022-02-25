@@ -37,6 +37,11 @@ namespace DeribitFutureSubscriber.RequestActions
 
         protected override Task<bool> HandlerAction(JObject jObject)
         {
+            var result = jObject["result"].Value<JArray>();
+            foreach (var channel in result)
+            {
+                Console.WriteLine($"Subscribed to : {channel.Value<string>()}");
+            }
             return Task.FromResult(true);
         }
 

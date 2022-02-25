@@ -56,8 +56,6 @@ namespace DeribitFutureSubscriber.NotificationHandlers
                 {
                     _insturmentTickersToInsert.Add(instrumentTicker);
                 }
-
-                Console.WriteLine("Received : " + test.Params.Data.InstrumentName);
             }
         }
 
@@ -72,7 +70,9 @@ namespace DeribitFutureSubscriber.NotificationHandlers
             {
                 toInsert = _insturmentTickersToInsert.ToList();
             }
+            Console.WriteLine($"Inserting {toInsert.Count()} tickers...");
             _dbAccess.Insert(toInsert);
+            Console.WriteLine($"Done");
             lock (_insturmentTickersToInsertLock)
             {
                 _insturmentTickersToInsert.Clear();
