@@ -44,9 +44,17 @@ namespace DeribitFutureSubscriber
                 {
                     var jobject = JObject.Parse(response);
 
-                    if (jobject.TryGetValue("error", out var jTokenError))
+                    if (jobject.ContainsKey("error"))
                     {
-                        Console.WriteLine("error received");
+                        var actionToRemove = new List<IRequestAction>();
+                        foreach (var action in _requestActions.ToList())
+                        {
+                            if (action.ErrorRequestHander(jobject).Result)
+                            {
+                                actionToRemove.Add(action);
+                            }
+                        }
+                        actionToRemove.ForEach(i => _requestActions.Remove(i));
                     }
 
                     if (jobject.ContainsKey("result"))
@@ -63,7 +71,7 @@ namespace DeribitFutureSubscriber
                         actionToRemove.ForEach(i => _requestActions.Remove(i));
                     }
 
-                    if (jobject.TryGetValue("params", out var jTokenParams))
+                    if (jobject.ContainsKey("params"))
                     {
                         HeartbeatNotificationHandler(jobject);
                         TickerNotificationHandler(jobject);

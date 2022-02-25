@@ -34,5 +34,11 @@ namespace DeribitFutureSubscriber.RequestActions
             Console.WriteLine("heartbeat test response received");
             return Task.FromResult(true);
         }
+
+        protected override Task<bool> ErrorHandlerAction(JObject jObject)
+        {
+            Console.Error.WriteLine("TestHeartbeatRequestAction error");
+            return Task.FromResult(true);
+        }
     }
 }

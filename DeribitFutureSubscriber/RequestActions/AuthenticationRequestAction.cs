@@ -46,5 +46,11 @@ namespace DeribitFutureSubscriber.RequestActions
 
             return Task.FromResult(true);
         }
+
+        protected override Task<bool> ErrorHandlerAction(JObject jObject)
+        {
+            Console.Error.WriteLine("AuthenticationRequestAction error");
+            return Task.FromResult(true);
+        }
     }
 }

@@ -1,7 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using DeribitFutureSubscriber.Models;
 using Models.DeribitFutureSubscriber;
 using Newtonsoft.Json.Linq;
 
@@ -55,6 +55,12 @@ namespace DeribitFutureSubscriber.RequestActions
             _requestActions.Add(new SubscribeRequestAction(_clientWebSocket, channels));
             _isChannelsLoaded = true;
 
+            return Task.FromResult(true);
+        }
+
+        protected override Task<bool> ErrorHandlerAction(JObject jObject)
+        {
+            Console.Error.WriteLine("LoadChannelRequestAction error");
             return Task.FromResult(true);
         }
     }

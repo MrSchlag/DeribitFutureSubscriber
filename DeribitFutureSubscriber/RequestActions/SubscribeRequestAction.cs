@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using DeribitFutureSubscriber.Models;
 using Models.DeribitFutureSubscriber;
@@ -36,6 +37,12 @@ namespace DeribitFutureSubscriber.RequestActions
 
         protected override Task<bool> HandlerAction(JObject jObject)
         {
+            return Task.FromResult(true);
+        }
+
+        protected override Task<bool> ErrorHandlerAction(JObject jObject)
+        {
+            Console.Error.WriteLine("SubscribeRequestAction error");
             return Task.FromResult(true);
         }
     }

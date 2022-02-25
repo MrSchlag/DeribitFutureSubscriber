@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using DeribitFutureSubscriber.Models;
@@ -19,20 +20,18 @@ namespace DeribitFutureSubscriber.RequestActions
 
         protected abstract Task<bool> HandlerAction(JObject jObject);
 
+        protected abstract Task<bool> ErrorHandlerAction(JObject jObject);
+
         protected abstract Task<int> RequestAction(int requestId);
 
         public async Task<bool> RequestHandler(JObject jObject)
         {
-            var id = (int)jObject["id"];
+            return await RequestIdMatch(jObject, new Func<Task<bool>>(() => HandlerAction(jObject)));
+        }
 
-            bool result = false;
-            if (_requestIdsWaited.Contains(id))
-            {
-                result = await HandlerAction(jObject);
-                _requestIdsWaited.Remove(id);
-                _waitingResponse = false;
-            }
-            return result && !_requestIdsWaited.Any();
+        public async Task<bool> ErrorRequestHander(JObject jObject)
+        {
+            return await RequestIdMatch(jObject, new Func<Task<bool>>(() => ErrorHandlerAction(jObject)));
         }
 
         public async Task<int> Request(int requestId)
@@ -43,6 +42,20 @@ namespace DeribitFutureSubscriber.RequestActions
                 _waitingResponse = true;
             }
             return requestId;
+        }
+
+        private async Task<bool> RequestIdMatch(JObject jObject, Func<Task<bool>> funcOnMatch)
+        {
+            var id = (int)jObject["id"];
+
+            bool result = false;
+            if (_requestIdsWaited.Contains(id))
+            {
+                result = await funcOnMatch();
+                _requestIdsWaited.Remove(id);
+                _waitingResponse = false;
+            }
+            return result && !_requestIdsWaited.Any();
         }
     }
 }
