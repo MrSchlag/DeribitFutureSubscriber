@@ -7,7 +7,7 @@ services:
     depends_on:
       - postgres
     ports:
-      - 50608:50608
+      - 8080:80
 
   subscriber:
     container_name: subscriber

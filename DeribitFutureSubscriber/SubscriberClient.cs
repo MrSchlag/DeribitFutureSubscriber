@@ -112,7 +112,22 @@ namespace DeribitFutureSubscriber
                     Name = test.Params.Data.InstrumentName,
                     Timestamp = new DateTime(1970, 1, 1, 0, 0, 0, 0).AddMilliseconds(test.Params.Data.Timestamp),
                     SettlementPrice = test.Params.Data.SettlementPrice,
-                    OpenInterest = test.Params.Data.OpenInterest
+                    OpenInterest = test.Params.Data.OpenInterest,
+                    BestAskAmount = test.Params.Data.BestAskAmount,
+                    BestAskPrice = test.Params.Data.BestAskPrice,
+                    BestBidAmount = test.Params.Data.BestBidAmount,
+                    BestBidPrice = test.Params.Data.BestBidPrice,
+                    EstimatedDeliveryPrice = test.Params.Data.EstimatedDeliveryPrice,
+                    IndexPrice = test.Params.Data.IndexPrice,
+                    LastPrice = test.Params.Data.LastPrice,
+                    MarkPrice = test.Params.Data.MarkPrice,
+                    MaxPrice = test.Params.Data.MaxPrice,
+                    MinPrice = test.Params.Data.MinPrice,
+                    High = test.Params.Data.Stats.High,
+                    Low = test.Params.Data.Stats.Low,
+                    PriceChange = test.Params.Data.Stats.PriceChange,
+                    Volume = test.Params.Data.Stats.Volume,
+                    VolumeUsd = test.Params.Data.Stats.VolumeUsd
                 };
 
                 lock (_insturmentTickersToInsertLock)

@@ -23,11 +23,11 @@ namespace DeribitFutureAPI.Controllers
         }
 
         [HttpGet]
-        public IEnumerable<FutureTicker> Get(string name, DateTime? startIncluded, DateTime? endExcluded, int? limit = 100)
+        public IEnumerable<FutureTicker> Get(string name, DateTime? startDateIncluded, DateTime? endDateExcluded, int? limit)
         {
             var fetcher = new FutureTickerFetcher(_futureTickerAccess);
 
-            var result = fetcher.GetFutureTickersWithName(name).ToList();
+            var result = fetcher.GetFutureTickerFilter(name, startDateIncluded, endDateExcluded, limit).ToList();
 
             return result.Select(i => new FutureTicker
             {

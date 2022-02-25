@@ -15,19 +15,23 @@ namespace DeribitFutureAPI
             _dbAccess = dbAccess;
         }
 
-        public IEnumerable<FutureTicker> GetFutureTickersBetween(DateTime startDateIncluded, DateTime endDateExcluded)
+        public IEnumerable<FutureTicker> GetFutureTickerFilter(string name,
+            DateTime? startDateIncluded,
+            DateTime? endDateExcluded,
+            int? limit)
         {
-            return _dbAccess.GetRecords().Where(i => i.Timestamp >= startDateIncluded && i.Timestamp < endDateExcluded);
-        }
+            var result = _dbAccess.GetRecords();
 
-        public IEnumerable<FutureTicker> GetFutureTickerBetweenWithName(DateTime startDateIncluded, DateTime endDateExcluded, string name)
-        {
-            return GetFutureTickersBetween(startDateIncluded, endDateExcluded).Where(i => i.Name == name);
-        }
+            if (!string.IsNullOrEmpty(name))
+                result = result.Where(i => i.Name == name);
+            if (startDateIncluded != null)
+                result = result.Where(i => i.Timestamp >= startDateIncluded);
+            if (endDateExcluded != null)
+                result = result.Where(i => i.Timestamp < endDateExcluded);
+            if (limit != null)
+                result = result.Take(limit.Value);
 
-        public IEnumerable<FutureTicker> GetFutureTickersWithName(string name)
-        {
-            return _dbAccess.GetRecords().Where(i => i.Name == name);
+            return result;
         }
     }
 }

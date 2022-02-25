@@ -6,8 +6,6 @@ namespace DeribitFutureAPI
 {
     public interface IFutureTickerFetcher
     {
-        IEnumerable<FutureTicker> GetFutureTickerBetweenWithName(DateTime startDateIncluded, DateTime endDateExcluded, string name);
-        IEnumerable<FutureTicker> GetFutureTickersBetween(DateTime startDateIncluded, DateTime endDateExcluded);
-        IEnumerable<FutureTicker> GetFutureTickersWithName(string name);
+        IEnumerable<FutureTicker> GetFutureTickerFilter(string name, DateTime? startDateIncluded, DateTime? endDateExcluded, int? limit);
     }
 }

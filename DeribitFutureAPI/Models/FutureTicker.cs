@@ -7,8 +7,8 @@ namespace DeribitFutureAPI.Models
 
         public string Name { get; set; }
 
-        public decimal SettlementPrice { get; set; }
+        public decimal? SettlementPrice { get; set; }
 
-        public decimal OpenInterest { get; set; }
+        public decimal? OpenInterest { get; set; }
     }
 }
