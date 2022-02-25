@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using DeribitFutureSubscriber.Models;
 using Models.DeribitFutureSubscriber;
 using Newtonsoft.Json.Linq;
 
@@ -20,7 +19,7 @@ namespace DeribitFutureSubscriber.RequestActions
         {
             var request = new JsonRfcRequest<ChannelParams>
             {
-                Method = "private/subscribe",
+                Method = Methods.Subscribe,
                 JsonRpc = "2.0",
                 Id = requestId,
                 Params = new ChannelParams

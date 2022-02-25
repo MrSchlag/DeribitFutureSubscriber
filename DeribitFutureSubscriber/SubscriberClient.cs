@@ -46,7 +46,7 @@ namespace DeribitFutureSubscriber
             var response = string.Empty;
             var authRequestAction = new AuthenticationRequestAction(_clientWebSocket, _cancellationTokenSource);
 
-            while (!_cancellationTokenSource.Token.IsCancellationRequested) //TODO : use cancellation token
+            while (!_cancellationTokenSource.Token.IsCancellationRequested)
             {
                 if (!string.IsNullOrEmpty(response))
                 {

@@ -16,7 +16,7 @@ namespace DeribitFutureSubscriber.RequestActions
         {
             var request = new JsonRfcRequest<IntervalParam>
             {
-                Method = "public/set_heartbeat", //TODO : const
+                Method = Methods.SetHeartbeat,
                 JsonRpc = "2.0", //TODO : const
                 Id = requestId,
                 Params = new IntervalParam

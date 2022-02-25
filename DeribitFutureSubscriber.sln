@@ -9,6 +9,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DeribitFutureAPI", "Deribit
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DeribitFutureDatabaseLibrary", "DeribitFutureDatabaseLibrary\DeribitFutureDatabaseLibrary.csproj", "{300CAEC3-E134-4335-B67B-BACEAC5B2881}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DeribitFutureTests", "DeribitFutureTests\DeribitFutureTests.csproj", "{D3A5F825-BA96-43A5-84E5-3D33958829FF}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,6 +29,10 @@ Global
 		{300CAEC3-E134-4335-B67B-BACEAC5B2881}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{300CAEC3-E134-4335-B67B-BACEAC5B2881}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{300CAEC3-E134-4335-B67B-BACEAC5B2881}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D3A5F825-BA96-43A5-84E5-3D33958829FF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D3A5F825-BA96-43A5-84E5-3D33958829FF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D3A5F825-BA96-43A5-84E5-3D33958829FF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D3A5F825-BA96-43A5-84E5-3D33958829FF}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

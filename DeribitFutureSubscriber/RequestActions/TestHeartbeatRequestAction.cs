@@ -16,13 +16,13 @@ namespace DeribitFutureSubscriber.RequestActions
         {
             var request = new JsonRfcRequest<IntervalParam>
             {
-                Method = "public/test",
+                Method = Methods.Test, //TODO: use const
                 JsonRpc = "2.0",
                 Id = requestId
             };
 
             _requestIdsWaited.Add(requestId++);
-            await _clientWebSocket.Send(request); //TODO: send in abstract and manage id in abstract
+            await _clientWebSocket.Send(request);
 
             Console.WriteLine("heartbeat test sent");
 

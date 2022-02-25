@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Threading;
 using System.Threading.Tasks;
-using DeribitFutureSubscriber.Models;
 using Models.DeribitFutureSubscriber;
 using Newtonsoft.Json.Linq;
 
@@ -25,12 +24,12 @@ namespace DeribitFutureSubscriber.RequestActions
                 {
                     JsonRpc = "2.0",
                     Id = requestId,
-                    Method = "public/auth",
+                    Method = Methods.Auth,
                     Params = new AuthRequestParams
                     {
                         GrantType = "client_credentials",
-                        ClientId = "vrIlT3qo",
-                        ClientSecret = "rmhiqP72b2LuLULwzcQ0EnoXRs024zRq6pz1fBIkM8w"
+                        ClientId = "vrIlT3qo", //TODO : as parametrable
+                        ClientSecret = "rmhiqP72b2LuLULwzcQ0EnoXRs024zRq6pz1fBIkM8w" //TODO : as parametrable
                     }
                 };
                 _requestIdsWaited.Add(requestId++);
@@ -45,7 +44,7 @@ namespace DeribitFutureSubscriber.RequestActions
             var token = jObject["result"];
             var expires_in = (int)token["expires_in"];
             _authExpiration = DateTime.Now.AddSeconds(expires_in);
-            Console.WriteLine($"auth OK : expires at {_authExpiration.ToLongDateString()} {_authExpiration.ToLocalTime()}");
+            Console.WriteLine($"Auth OK : expires at {_authExpiration.ToLongDateString()} {_authExpiration.ToLocalTime()}");
 
             return Task.FromResult(true);
         }

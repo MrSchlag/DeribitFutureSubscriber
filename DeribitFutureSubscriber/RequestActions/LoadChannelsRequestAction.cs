@@ -29,7 +29,7 @@ namespace DeribitFutureSubscriber.RequestActions
                 {
                     var request = new JsonRfcRequest<InstrumentParam>
                     {
-                        Method = "public/get_instruments",
+                        Method = Methods.GetInstruments,
                         JsonRpc = "2.0",
                         Id = requestId,
                         Params = new InstrumentParam

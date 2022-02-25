@@ -1,4 +1,5 @@
-﻿using DeribitFutureSubscriber.DbModels;
+﻿using DeribitFutureDatabaseLibrary;
+using DeribitFutureSubscriber.DbModels;
 using Microsoft.EntityFrameworkCore;
 
 namespace DeribitFutureSubscriber
@@ -12,7 +13,7 @@ namespace DeribitFutureSubscriber
 
         protected override void OnConfiguring(DbContextOptionsBuilder option)
         {
-            option.UseNpgsql("User ID=postgres;Password=mysecretpassword;Host=postgres;Port=5432;Database=MarketData2;Pooling=true;");
+            option.UseNpgsql(Connexion.ConnexionString);
         }
 
         public DbSet<FutureTicker> FutureTickers { get; set; }

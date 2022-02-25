@@ -9,7 +9,7 @@ using Microsoft.Extensions.Logging;
 namespace DeribitFutureAPI.Controllers
 {
     [ApiController]
-    [Route("[controller]")]
+    [Route("futureticker")]
     public class FutureTickerController : ControllerBase
     {
         private readonly ILogger<FutureTickerController> _logger;
@@ -26,7 +26,6 @@ namespace DeribitFutureAPI.Controllers
         public IEnumerable<FutureTicker> Get(string name, DateTime? startDateIncluded, DateTime? endDateExcluded, int? limit)
         {
             var fetcher = new FutureTickerFetcher(_futureTickerAccess);
-
             var result = fetcher.GetFutureTickerFilter(name, startDateIncluded, endDateExcluded, limit).ToList();
 
             return result.Select(i => new FutureTicker
@@ -34,7 +33,22 @@ namespace DeribitFutureAPI.Controllers
                 Name = i.Name,
                 OpenInterest = i.OpenInterest,
                 SettlementPrice = i.SettlementPrice,
-                Timestamp = i.Timestamp
+                Timestamp = i.Timestamp,
+                BestAskAmount = i.BestAskAmount,
+                BestAskPrice = i.BestAskPrice,
+                BestBidAmount = i.BestBidAmount,
+                BestBidPrice = i.BestBidPrice,
+                EstimatedDeliveryPrice = i.EstimatedDeliveryPrice,
+                High = i.High,
+                IndexPrice = i.IndexPrice,
+                LastPrice = i.LastPrice,
+                Low = i.Low,
+                MarkPrice = i.MarkPrice,
+                MaxPrice = i.MaxPrice,
+                MinPrice = i.MinPrice,
+                PriceChange = i.PriceChange,
+                Volume = i.Volume,
+                VolumeUsd = i.VolumeUsd
             });
         }
     }
