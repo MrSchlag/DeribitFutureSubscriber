@@ -6,9 +6,11 @@ This project is composed of 3 parts :
 
 Setup via Docker-compose :
   - Build solution
-  - Go to project root
-  - docker-compose build
-  - docker-build up
+  - Go to project root and run following commands :
+  ```
+  docker-compose build
+  docker-compose up
+  ```
   - postgres launches first then DeribitSubscribe and the API
 
 Setup outside docker : 
